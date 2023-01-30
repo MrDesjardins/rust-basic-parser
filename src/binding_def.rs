@@ -1,5 +1,5 @@
-use crate::utils;
 use crate::env::Env;
+use crate::utils;
 use crate::Expr;
 #[derive(Debug, PartialEq)]
 pub struct BindingDef {
@@ -10,9 +10,9 @@ pub struct BindingDef {
 impl BindingDef {
     pub fn new(s: &str) -> Result<(&str, Self), String> {
         let s = utils::tag("let", s)?;
-        let (s, _) = utils::extract_whitespace(s);
+        let (s, _) = utils::extract_whitespace1(s)?; // New!
 
-        let (s, name) = utils::extract_ident(s)?; // here
+        let (s, name) = utils::extract_ident(s)?;
         let (s, _) = utils::extract_whitespace(s);
 
         let s = utils::tag("=", s)?;
@@ -29,8 +29,9 @@ impl BindingDef {
         ))
     }
 
-    pub fn eval(&self, env: &mut Env) {
-        env.store_binding(self.name.clone(), self.val.eval());
+    pub(crate) fn eval(&self, env: &mut Env) -> Result<(), String> {
+        env.store_binding(self.name.clone(), self.val.eval(env)?);
+        Ok(())
     }
 }
 
@@ -54,6 +55,13 @@ mod tests {
                     },
                 },
             )),
+        );
+    }
+    #[test]
+    fn cannot_parse_binding_def_without_space_after_let() {
+        assert_eq!(
+            BindingDef::new("letaaa=1+2"),
+            Err("expected whitespace".to_string()),
         );
     }
 }

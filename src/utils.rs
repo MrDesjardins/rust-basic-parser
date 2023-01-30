@@ -1,3 +1,5 @@
+const WHITESPACE: &[char] = &[' ', '\n'];
+
 pub fn take_while(accept: impl Fn(char) -> bool, s: &str) -> (&str, &str) {
     let extracted_end = s
         .char_indices()
@@ -13,8 +15,16 @@ pub(crate) fn extract_digits(s: &str) -> Result<(&str, &str), String> {
     take_while1(|c| c.is_ascii_digit(), s, "expected digits".to_string())
 }
 
-pub fn extract_whitespace(s: &str) -> (&str, &str) {
-    take_while(|c| c == ' ', s)
+pub(crate) fn extract_whitespace(s: &str) -> (&str, &str) {
+    take_while(|c| WHITESPACE.contains(&c), s)
+}
+
+pub(crate) fn extract_whitespace1(s: &str) -> Result<(&str, &str), String> {
+    take_while1(
+        |c| WHITESPACE.contains(&c),
+        s,
+        "expected whitespace".to_string(),
+    )
 }
 
 pub(crate) fn extract_ident(s: &str) -> Result<(&str, &str), String> {
@@ -43,7 +53,6 @@ pub(crate) fn take_while1(
     error_msg: String,
 ) -> Result<(&str, &str), String> {
     let (remainder, extracted) = take_while(accept, s);
-
     if extracted.is_empty() {
         Err(error_msg)
     } else {
@@ -75,26 +84,6 @@ mod tests {
     }
 
     #[test]
-    fn extract_plus() {
-        assert_eq!(extract_op("+2"), ("2", "+"));
-    }
-
-    #[test]
-    fn extract_minus() {
-        assert_eq!(extract_op("-10"), ("10", "-"));
-    }
-
-    #[test]
-    fn extract_star() {
-        assert_eq!(extract_op("*3"), ("3", "*"));
-    }
-
-    #[test]
-    fn extract_slash() {
-        assert_eq!(extract_op("/4"), ("4", "/"));
-    }
-
-    #[test]
     fn extract_spaces() {
         assert_eq!(extract_whitespace("    1"), ("1", "    "));
     }
@@ -121,5 +110,17 @@ mod tests {
             Err("expected identifier".to_string()),
         );
     }
-    
+
+    #[test]
+    fn extract_newlines_or_spaces() {
+        assert_eq!(extract_whitespace(" \n   \n\nabc"), ("abc", " \n   \n\n"));
+    }
+
+    #[test]
+    fn do_not_extract_spaces1_when_input_does_not_start_with_them() {
+        assert_eq!(
+            extract_whitespace1("blah"),
+            Err("expected whitespace".to_string()),
+        );
+    }
 }
