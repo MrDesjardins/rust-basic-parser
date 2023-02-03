@@ -3,12 +3,12 @@ use crate::utils;
 use crate::val::Val;
 
 #[derive(Debug, PartialEq)]
-pub struct BindingUsage {
-    pub name: String,
+pub(crate) struct BindingUsage {
+    pub(super) name: String,
 }
 
 impl BindingUsage {
-    pub fn new(s: &str) -> Result<(&str, Self), String> {
+    pub(super) fn new(s: &str) -> Result<(&str, Self), String> {
         let (s, name) = utils::extract_ident(s)?;
 
         Ok((
@@ -19,15 +19,13 @@ impl BindingUsage {
         ))
     }
 
-    pub(crate) fn eval(&self, env: &Env) -> Result<Val, String> {
+    pub(super) fn eval(&self, env: &Env) -> Result<Val, String> {
         env.get_binding_value(&self.name)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::expr::Expr;
-
     use super::*;
 
     #[test]
@@ -67,20 +65,6 @@ mod tests {
             }
             .eval(&empty_env),
             Err("binding with name ‘i_dont_exist’ does not exist".to_string()),
-        );
-    }
-
-    #[test]
-    fn eval_binding_usage() {
-        let mut env = Env::default();
-        env.store_binding("ten".to_string(), Val::Number(10));
-
-        assert_eq!(
-            Expr::BindingUsage(BindingUsage {
-                name: "ten".to_string(),
-            })
-            .eval(&env),
-            Ok(Val::Number(10)),
         );
     }
 }

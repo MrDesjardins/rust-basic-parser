@@ -4,12 +4,12 @@ use crate::utils;
 use crate::val::Val;
 
 #[derive(Debug, PartialEq)]
-pub struct Block {
-    pub stmts: Vec<Stmt>,
+pub(crate) struct Block {
+    pub(super) stmts: Vec<Stmt>,
 }
 
 impl Block {
-    pub fn new(s: &str) -> Result<(&str, Self), String> {
+    pub(super) fn new(s: &str) -> Result<(&str, Self), String> {
         let s = utils::tag("{", s)?;
         let (s, _) = utils::extract_whitespace(s);
 
@@ -29,7 +29,8 @@ impl Block {
 
         Ok((s, Block { stmts }))
     }
-    pub(crate) fn eval(&self, env: &Env) -> Result<Val, String> {
+
+    pub(super) fn eval(&self, env: &Env) -> Result<Val, String> {
         if self.stmts.is_empty() {
             return Ok(Val::Unit);
         }
@@ -48,17 +49,15 @@ impl Block {
 
 #[cfg(test)]
 mod tests {
-    use super::super::{Expr, Number};
+    use super::super::{BindingUsage, Expr, Number, Op};
     use super::*;
     use crate::binding_def::BindingDef;
-    use crate::env::Env;
-    use crate::expr::Op;
-    use crate::expr::binding_usage::BindingUsage;
-    use crate::val::Val;
+
     #[test]
     fn parse_empty_block() {
         assert_eq!(Block::new("{}"), Ok(("", Block { stmts: Vec::new() })));
     }
+
     #[test]
     fn parse_empty_block_with_whitespace() {
         assert_eq!(Block::new("{   }"), Ok(("", Block { stmts: Vec::new() })));
@@ -109,16 +108,7 @@ mod tests {
             )),
         );
     }
-    #[test]
-    fn eval_block() {
-        assert_eq!(
-            Expr::Block(Block {
-                stmts: vec![Stmt::Expr(Expr::Number(Number(10)))],
-            })
-            .eval(&Env::default()),
-            Ok(Val::Number(10)),
-        );
-    }
+
     #[test]
     fn eval_empty_block() {
         assert_eq!(
@@ -156,6 +146,7 @@ mod tests {
             Ok(Val::Number(1)),
         );
     }
+
     #[test]
     fn eval_block_with_multiple_binding_defs() {
         assert_eq!(
@@ -198,6 +189,7 @@ mod tests {
             Ok(Val::Number(3)),
         );
     }
+
     #[test]
     fn eval_block_using_bindings_from_parent_env() {
         let mut env = Env::default();

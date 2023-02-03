@@ -1,16 +1,17 @@
 use crate::env::Env;
+use crate::expr::Expr;
 use crate::utils;
-use crate::Expr;
+
 #[derive(Debug, PartialEq)]
-pub struct BindingDef {
-    pub name: String,
-    pub val: Expr,
+pub(crate) struct BindingDef {
+    pub(crate) name: String,
+    pub(crate) val: Expr,
 }
 
 impl BindingDef {
-    pub fn new(s: &str) -> Result<(&str, Self), String> {
+    pub(crate) fn new(s: &str) -> Result<(&str, Self), String> {
         let s = utils::tag("let", s)?;
-        let (s, _) = utils::extract_whitespace1(s)?; // New!
+        let (s, _) = utils::extract_whitespace1(s)?;
 
         let (s, name) = utils::extract_ident(s)?;
         let (s, _) = utils::extract_whitespace(s);
@@ -57,6 +58,7 @@ mod tests {
             )),
         );
     }
+
     #[test]
     fn cannot_parse_binding_def_without_space_after_let() {
         assert_eq!(
