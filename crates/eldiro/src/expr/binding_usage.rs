@@ -4,7 +4,7 @@ use crate::val::Val;
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct BindingUsage {
-    pub(super) name: String,
+    pub(crate) name: String,
 }
 
 impl BindingUsage {
@@ -64,7 +64,7 @@ mod tests {
                 name: "i_dont_exist".to_string(),
             }
             .eval(&empty_env),
-            Err("binding with name ‘i_dont_exist’ does not exist".to_string()),
+            Err("binding with name 'i_dont_exist' does not exist".to_string()),
         );
     }
 }

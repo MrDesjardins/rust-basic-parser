@@ -21,7 +21,7 @@ impl<'parent> Env<'parent> {
 
     pub(crate) fn get_binding_value(&self, name: &str) -> Result<Val, String> {
         self.get_binding_value_without_error_msg(name)
-            .ok_or_else(|| format!("binding with name `{}` does not exist", name))
+            .ok_or_else(|| format!("binding with name '{}' does not exist", name))
     }
 
     fn get_binding_value_without_error_msg(&self, name: &str) -> Option<Val> {
