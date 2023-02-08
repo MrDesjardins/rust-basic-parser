@@ -7,7 +7,7 @@ mod val;
 
 pub use env::Env;
 pub use val::Val;
-
+#[derive(Debug)]
 pub struct Parse(stmt::Stmt);
 
 impl Parse {

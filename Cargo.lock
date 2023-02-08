@@ -3,5 +3,12 @@
 version = 3
 
 [[package]]
-name = "rust-basic-parser"
+name = "eldiro"
 version = "0.1.0"
+
+[[package]]
+name = "eldiro-cli"
+version = "0.1.0"
+dependencies = [
+ "eldiro",
+]
