@@ -17,6 +17,7 @@ impl FuncDef {
 
         let (s, params) = utils::sequence(
             |s| utils::extract_ident(s).map(|(s, ident)| (s, ident.to_string())),
+            utils::extract_whitespace,
             s,
         )?;
 
@@ -42,7 +43,7 @@ impl FuncDef {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::expr::{Block, Expr, BindingUsage, Op};
+    use crate::expr::{BindingUsage, Block, Expr, Op};
 
     #[test]
     fn parse_func_def_with_no_params_and_empty_body() {
